@@ -1,0 +1,39 @@
+<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+      <img src="/images/logo.jpeg" alt="Logo" class="navbar-brand-logo">
+    </a>
+    
+    <!-- Search Bar - Amazon Style -->
+    <div class="search-bar-container-amazon">
+      <form class="search-form-amazon" id="searchForm" method="GET" action="/listings/search/results">
+        <input 
+          type="text" 
+          id="searchTitle" 
+          name="title" 
+          class="search-input-amazon" 
+          placeholder="Search events by title..."
+          required>
+        <button class="search-button-amazon" type="submit">
+          <i class="fas fa-magnifying-glass"></i>
+        </button>
+      </form>
+    </div>
+
+    <button class="navbar-toggler" 
+    type="button" 
+    data-bs-toggle="collapse" 
+    data-bs-target="#navbarNavAltMarkup"
+    aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" href="/listings">Join an event</a>
+        <a class="nav-link" href="/listings/new">Host an event</a>
+        <a class="nav-link btn-login" href="/login">Log in</a>
+        <a class="nav-link btn-signup" href="/signup">Sign up</a>
+      </div>
+    </div>
+  </div>
+</nav>

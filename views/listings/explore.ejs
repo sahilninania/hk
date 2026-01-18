@@ -1,0 +1,557 @@
+<% fullWidth = true; layout("layout/boilerplate") %>
+
+<div class="explore-page">
+    <!-- Header Section
+    <div class="explore-header">
+        <div class="explore-header-content">
+            <h1>Discover All Events</h1>
+            <p>Join the world's best online and in-person events</p>
+        </div>
+    </div> -->
+
+    <!-- Search and Filters Section -->
+    <div class="explore-container">
+        <div class="explore-top">
+            <!-- Search Bar -->
+            <form method="GET" action="/listings/explore" class="search-form">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="title" placeholder="Search by event title or keyword" value="<%= typeof searchQuery !== 'undefined' && searchQuery && searchQuery.title ? searchQuery.title : '' %>">
+                    <button type="submit" class="search-btn">Search</button>
+                </div>
+            </form>
+
+            <!-- Results Info and Sort -->
+            <div class="results-header">
+                <p class="results-count">Showing <strong><%= allListings.length %></strong> events</p>
+                <div class="sort-options">
+                    <label>Sort by:</label>
+                    <select id="sortBy" onchange="handleSort(this.value)">
+                        <option value="recent">Recently Added</option>
+                        <option value="popular">Most Popular</option>
+                        <option value="prize">Highest Prize</option>
+                        <option value="date">Upcoming First</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="explore-content">
+            <!-- Filters Sidebar -->
+            <aside class="filters-sidebar">
+                <form id="filtersForm" method="GET" action="/listings/explore">
+                    <div class="filter-section">
+                        <h3>Filters</h3>
+                        <a href="/listings/explore" class="clear-filters">Clear all</a>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="filter-section">
+                        <h4>Category</h4>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" name="category" value="Tech" <%= (searchQuery.categories && searchQuery.categories.includes('Tech')) ? 'checked' : '' %>> Tech & Innovation
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="category" value="Sports" <%= (searchQuery.categories && searchQuery.categories.includes('Sports')) ? 'checked' : '' %>> Sports & Fitness
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="category" value="Cultural" <%= (searchQuery.categories && searchQuery.categories.includes('Cultural')) ? 'checked' : '' %>> Cultural & Arts
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Mode Filter -->
+                    <div class="filter-section">
+                        <h4>Event Mode</h4>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" name="mode" value="Online" <%= (searchQuery.modes && searchQuery.modes.includes('Online')) ? 'checked' : '' %>> Online
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="mode" value="Offline" <%= (searchQuery.modes && searchQuery.modes.includes('Offline')) ? 'checked' : '' %>> Offline
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="mode" value="Hybrid" <%= (searchQuery.modes && searchQuery.modes.includes('Hybrid')) ? 'checked' : '' %>> Hybrid
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="filter-section">
+                        <h4>Status</h4>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" name="status" value="Open" <%= (searchQuery.statuses && searchQuery.statuses.includes('Open')) ? 'checked' : '' %>> Open for Registration
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="status" value="Upcoming" <%= (searchQuery.statuses && searchQuery.statuses.includes('Upcoming')) ? 'checked' : '' %>> Upcoming
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="status" value="Closing Soon" <%= (searchQuery.statuses && searchQuery.statuses.includes('Closing Soon')) ? 'checked' : '' %>> Closing Soon
+                            </label>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="title" id="filtersTitle" value="<%= searchQuery.title || '' %>">
+                    <input type="hidden" name="sort" id="filtersSort" value="<%= searchQuery.sortBy || 'recent' %>">
+                </form>
+            </aside>
+
+            <!-- Events Grid -->
+            <main class="events-grid-section">
+                <% if(allListings.length === 0) { %>
+                    <div class="no-events">
+                        <i class="fas fa-inbox fa-5x"></i>
+                        <h3>No Events Found</h3>
+                        <p>Try adjusting your search or filters to find events</p>
+                        <a href="/listings/explore" class="btn btn-primary">Clear Filters</a>
+                    </div>
+                <% } else { %>
+                    <div class="events-grid">
+                        <% allListings.forEach(listing => { %>
+                        <div class="event-card explore-event-card">
+                            <a href="/listings/<%= listing._id %>" style="text-decoration: none; color: inherit;">
+                                <div class="event-card-image">
+                                    <img src="<%= (listing.image ? encodeURI(listing.image) : ('https://via.placeholder.com/400x250?text=' + encodeURIComponent(listing.title))) %>" 
+                                         alt="<%= listing.title %>">
+                                    <span class="status-badge status-<%= listing.status === 'Open' ? 'open' : listing.status === 'Upcoming' ? 'upcoming' : 'closing' %>">
+                                        <%= listing.status %>
+                                    </span>
+                                </div>
+                                <div class="event-card-body">
+                                    <h3 class="event-title"><%= listing.title %></h3>
+                                    <p class="event-theme">
+                                        <i class="fas fa-tag"></i> <%= listing.theme %>
+                                    </p>
+                                    <div class="event-meta">
+                                        <span class="meta-item">
+                                            <i class="fas fa-calendar"></i> <%= new Date(listing.date).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'}) %>
+                                        </span>
+                                        <span class="meta-item">
+                                            <i class="fas fa-<%= listing.mode === 'Online' ? 'laptop' : listing.mode === 'Offline' ? 'map-marker-alt' : 'sync' %>"></i> <%= listing.mode %>
+                                        </span>
+                                    </div>
+                                    <div class="event-meta">
+                                        <span class="meta-item">
+                                            <i class="fas fa-users"></i> <%= listing.teamSize %>
+                                        </span>
+                                        <span class="meta-item">
+                                            <i class="fas fa-map-marker-alt"></i> <%= listing.location %>
+                                        </span>
+                                    </div>
+                                    <div class="event-footer">
+                                        <span class="prize-badge">
+                                            <i class="fas fa-trophy"></i> <%= listing.prize %>
+                                        </span>
+                                        <span class="category-badge bg-<%= listing.category === 'Tech' ? 'primary' : listing.category === 'Sports' ? 'danger' : 'info' %>">
+                                            <%= listing.category %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </main>
+        </div>
+    </div>
+</div>
+
+<style>
+    .explore-page {
+        background: #f8f9fa;
+        min-height: 100vh;
+    }
+
+    .explore-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+
+    .explore-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .explore-header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .explore-container {
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 2rem 3rem;
+        box-sizing: border-box;
+    }
+
+    .explore-top {
+        margin-bottom: 3rem;
+    }
+
+    .search-form {
+        margin-bottom: 2rem;
+    }
+
+    .search-box {
+        display: flex;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 0.5rem;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .search-box i {
+        padding: 0 1rem;
+        color: #999;
+    }
+
+    .search-box input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .search-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+
+    .search-btn:hover {
+        background: #0056b3;
+    }
+
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .results-count {
+        font-size: 1rem;
+        color: #666;
+    }
+
+    .sort-options {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .sort-options label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .sort-options select {
+        padding: 0.5rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .explore-content {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 2rem;
+    }
+
+    .filters-sidebar {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        height: fit-content;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .filter-section {
+        margin-bottom: 2rem;
+    }
+
+    .filter-section h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .filter-section h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    .clear-filters {
+        color: #007bff;
+        text-decoration: none;
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+
+    .clear-filters:hover {
+        text-decoration: underline;
+    }
+
+    .filter-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .filter-option {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 4px;
+        transition: background 0.2s;
+    }
+
+    .filter-option:hover {
+        background: #f0f0f0;
+    }
+
+    .filter-option input {
+        margin-right: 0.75rem;
+        cursor: pointer;
+    }
+
+    .events-grid-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .event-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+        border: 1px solid #e0e0e0;
+    }
+
+    .event-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        transform: translateY(-4px);
+    }
+
+    .event-card a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        height: 100%;
+    }
+
+    .event-card-image {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+        background: #f0f0f0;
+    }
+
+    .event-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .status-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-open {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-upcoming {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-closing {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .event-card-body {
+        padding: 1.5rem;
+    }
+
+    .event-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+        color: #333;
+    }
+
+    .event-theme {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .event-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: #999;
+        margin-bottom: 0.75rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .event-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .prize-badge {
+        background: #e7f3ff;
+        color: #0066cc;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .category-badge {
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .no-events {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .no-events i {
+        color: #ddd;
+        margin-bottom: 1rem;
+    }
+
+    .no-events h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #666;
+    }
+
+    .no-events p {
+        color: #999;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .explore-content {
+            grid-template-columns: 1fr;
+        }
+
+        .filters-sidebar {
+            display: none;
+        }
+
+        .results-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .events-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .explore-header h1 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<script>
+    function handleSort(value) {
+        // Update hidden sort and title then submit the filters form
+        const filtersSort = document.getElementById('filtersSort');
+        const filtersTitle = document.getElementById('filtersTitle');
+        const titleInput = document.querySelector('.search-box input[name="title"]');
+        if (filtersSort) filtersSort.value = value;
+        if (filtersTitle && titleInput) filtersTitle.value = titleInput.value;
+        const filtersForm = document.getElementById('filtersForm');
+        if (filtersForm) filtersForm.submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const filtersForm = document.getElementById('filtersForm');
+        if (!filtersForm) return;
+        const checkboxes = filtersForm.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.addEventListener('change', () => {
+            const titleInput = document.querySelector('.search-box input[name="title"]');
+            const filtersTitle = document.getElementById('filtersTitle');
+            const filtersSort = document.getElementById('filtersSort');
+            if (filtersTitle && titleInput) filtersTitle.value = titleInput.value;
+            if (filtersSort) filtersSort.value = document.getElementById('sortBy').value;
+            filtersForm.submit();
+        }));
+
+        const searchForm = document.querySelector('.search-form');
+        if (searchForm) {
+            searchForm.addEventListener('submit', () => {
+                const filtersTitle = document.getElementById('filtersTitle');
+                if (filtersTitle) filtersTitle.value = document.querySelector('.search-box input[name="title"]').value;
+            });
+        }
+    });
+</script>
+</body>

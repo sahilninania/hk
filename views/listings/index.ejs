@@ -1,0 +1,487 @@
+<% layout("layout/boilerplate") %>
+
+<!-- Auto-rotating Carousel Banner -->
+<div class="banner-section">
+    <div class="banner-content">
+        <div class="banner-left">
+            <h1 class="banner-title" id="bannerTitle">Innovating the Digital Future</h1>
+            <p class="banner-subtitle" id="bannerSubtitle">Explore the latest advancements in technology through expert talks, live demonstrations, and interactive sessions designed to inspire innovation and digital growth.</p>
+            <div class="banner-buttons">
+                <a href="/listings" class="btn btn-primary-banner">Explore Events</a>
+                <a href="/listings/new" class="btn btn-secondary-banner">Create Event</a>
+            </div>
+        </div>
+        <div class="banner-right">
+            <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="banner-image" style="background-image: url('/images/heor/tech.jpeg'); background-size: cover; background-position: center;">
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="banner-image" style="background-image: url('/images/heor/soparts.jpeg'); background-size: cover; background-position: center;">
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="banner-image" style="background-image: url('/images/heor/cultruls.jpeg'); background-size: cover; background-position: center;">
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="banner-image" style="background-image: url('/images/heor/workshop.jpeg'); background-size: cover; background-position: center;">
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Events Carousel Section -->
+<div class="featured-section">
+    <div class="featured-header">
+        <h2>Tech Hackathons</h2>
+    </div>
+    <div class="featured-carousel">
+        <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-inner">
+                <% 
+                    // Group listings by category and get exactly 4 from each
+                    const categoryGroups = {};
+                    allListings.forEach(listing => {
+                        const cat = listing.category || 'Other';
+                        if (!categoryGroups[cat]) {
+                            categoryGroups[cat] = [];
+                        }
+                        categoryGroups[cat].push(listing);
+                    });
+                    
+                    // Get exactly 4 events from each category (max 16 total)
+                    const allFeatured = [];
+                    for (const category in categoryGroups) {
+                        const eventsToTake = Math.min(4, categoryGroups[category].length);
+                        allFeatured.push(...categoryGroups[category].slice(0, eventsToTake));
+                    }
+                    
+                    const featuredCardsPerSlide = 4;
+                    
+                    for (let i = 0; i < allFeatured.length; i += featuredCardsPerSlide) {
+                        const slideCards = allFeatured.slice(i, i + featuredCardsPerSlide);
+                        const isActive = i === 0 ? 'active' : '';
+                %>
+                <div class="carousel-item <%= isActive %>">
+                    <div class="featured-cards-row">
+                        <% slideCards.forEach(listing => { %>
+                        <div class="featured-card">
+                            <a href="/listings/<%= listing._id %>" style="text-decoration: none; color: inherit;">
+                                <div class="featured-card-image">
+                                    <img src="<%= listing.image %>" 
+                                         alt="<%= listing.title %>">
+                                    <div class="featured-badge-group">
+                                        <span class="featured-badge status-<%= listing.status === 'Open' ? 'open' : listing.status === 'Upcoming' ? 'upcoming' : 'closing' %>">
+                                            <%= listing.status %>
+                                        </span>
+                                        <button class="featured-heart" aria-label="Add to favorites">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="featured-card-content">
+                                    <h3 class="featured-card-title"><%= listing.title %></h3>
+                                    <p class="featured-card-category">
+                                        <i class="fas fa-tag"></i> <%= listing.theme %>
+                                    </p>
+                                    <p class="featured-card-category">
+                                        <i class="fas fa-<%= listing.mode === 'Online' ? 'laptop' : listing.mode === 'Offline' ? 'map-marker-alt' : 'sync' %>"></i> <%= listing.mode %>
+                                    </p>
+                                    <div class="featured-card-info">
+                                        <span class="info-item">
+                                            <i class="fas fa-calendar"></i> <%= new Date(listing.date).toLocaleDateString('en-IN', {day: 'numeric', month: 'short'}) %>
+                                        </span>
+                                        <span class="info-item">
+                                            <i class="fas fa-users"></i> <%= listing.teamSize %>
+                                        </span>
+                                    </div>
+                                    <div class="featured-card-footer">
+                                        <strong class="prize"><i class="fas fa-trophy"></i> <%= listing.prize %></strong>
+                                        <span class="info-item">
+                                            <i class="fas fa-map-marker-alt"></i> <%= listing.location %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+            <button class="carousel-control-prev featured-carousel-btn" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-control-next featured-carousel-btn" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+    <div class="container mt-4">
+            <div>
+                <!-- <h1 class="display-5">All Events</h1> -->
+                <% if(typeof searchQuery !== 'undefined' && searchQuery && searchQuery.title) { %>
+                    <p class="text-muted">
+                        Search Results for "<%= searchQuery.title %>"
+                        | <a href="/listings" class="btn btn-sm btn-outline-secondary">Clear Search</a>
+                    </p>
+                <% } %>
+            </div>
+            <!-- <a href="/listings/new" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create New Event
+            </a> -->
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+            <% 
+                // Get all listings except those in featured carousel
+                const featuredIds = allFeatured.map(item => item._id.toString());
+                const remainingListings = allListings.filter(listing => !featuredIds.includes(listing._id.toString()));
+                
+                // Group remaining listings by category and get exactly 4 from each
+                const gridCategoryGroups = {};
+                remainingListings.forEach(listing => {
+                    const cat = listing.category || 'Other';
+                    if (!gridCategoryGroups[cat]) {
+                        gridCategoryGroups[cat] = [];
+                    }
+                    gridCategoryGroups[cat].push(listing);
+                });
+                
+                // Get exactly 4 events from each category (max 16 total)
+                const gridListings = [];
+                for (const category in gridCategoryGroups) {
+                    const eventsToTake = Math.min(4, gridCategoryGroups[category].length);
+                    gridListings.push(...gridCategoryGroups[category].slice(0, eventsToTake));
+                }
+                
+                // Shuffle for mix up
+                const shuffledGridListings = gridListings.sort(() => Math.random() - 0.5);
+            %>
+            <% shuffledGridListings.forEach(listing => { %>
+            <div class="col">
+                <a href="/listings/<%= listing._id %>" style="text-decoration: none; color: inherit;">
+                    <div class="card h-100 shadow-sm" style="transition: transform 0.3s ease;">
+                        <div class="position-relative">
+                            <img src="<%= (listing.image ? encodeURI(listing.image) : ('https://via.placeholder.com/400x300?text=' + encodeURIComponent(listing.title))) %>" 
+                                 class="card-img-top" 
+                                 alt="<%= listing.title %>" 
+                                 style="height: 200px; object-fit: cover;">
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-<%= listing.status === 'Open' ? 'success' : listing.status === 'Upcoming' ? 'warning' : 'danger' %>">
+                                    <%= listing.status %>
+                                </span>
+                            </div>
+                            <div class="position-absolute top-0 start-0 m-2">
+                                <span class="badge bg-<%= listing.category === 'Tech' ? 'primary' : listing.category === 'Sports' ? 'danger' : listing.category === 'Cultural' ? 'info' : 'secondary' %>">
+                                    <%= listing.category %>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title mb-2"><%= listing.title %></h5>
+                            <p class="card-text text-muted small mb-2">
+                                <i class="fas fa-tag"></i> <%= listing.theme %>
+                            </p>
+                            <div class="mb-2">
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-<%= listing.mode === 'Online' ? 'laptop' : listing.mode === 'Offline' ? 'map-marker-alt' : 'sync' %>"></i>
+                                    <%= listing.mode %>
+                                </span>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar"></i> <%= new Date(listing.date).toLocaleDateString('en-IN', {day: 'numeric', month: 'short'}) %>
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-users"></i> <%= listing.teamSize %>
+                                    </small>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong class="text-success">
+                                        <i class="fas fa-trophy"></i> <%= listing.prize %>
+                                    </strong>
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt"></i> <%= listing.location %>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <% }) %>
+        </div>
+
+        <!-- Explore More Button -->
+        <div class="text-center mt-5 mb-5">
+            <a href="/listings/explore" class="btn btn-primary btn-lg" style="padding: 12px 40px; font-size: 16px;">
+                <i class="fas fa-arrow-right"></i> Explore More Events
+            </a>
+        </div>
+
+        <!-- Competitions Section -->
+        <div class="competitions-section mt-4 mb-5">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="competitions-accent"></div>
+                    <div>
+                        <h3 class="mb-1 competitions-title">Competitions</h3>
+                        <p class="text-muted small mb-0">Uncover the most talked-about competitions today.</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="/listings/explore" class="btn btn-viewall">
+                        View All <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+
+                <% 
+                // Use up to 16 competition cards, fallback to allListings if allFeatured not set
+                const competitions = (typeof allFeatured !== 'undefined' && allFeatured.length) ? allFeatured.slice(0,16) : allListings.slice(0,16);
+                const compCardsPerSlide = 4;
+            %>
+            <div id="competitionsCarousel" class="carousel slide competitions-carousel" data-bs-ride="carousel" data-bs-interval="5000">
+                <div class="carousel-inner">
+                    <% for (let i = 0; i < competitions.length; i += compCardsPerSlide) {
+                        const slideCards = competitions.slice(i, i + compCardsPerSlide);
+                        const isActive = (i === 0) ? 'active' : '';
+                    %>
+                    <div class="carousel-item <%= isActive %>">
+                        <div class="row g-3 align-items-stretch">
+                            <% slideCards.forEach(listing => { %>
+                            <div class="col-12 col-md-6 col-lg-3">
+                                <a href="/listings/<%= listing._id %>" style="text-decoration: none; color: inherit;">
+                                    <div class="competition-card h-100 rounded shadow-sm bg-white overflow-hidden">
+                                        <div class="competition-top p-3 d-flex justify-content-between align-items-center">
+                                            <div class="d-flex flex-column">
+                                                <div class="small-badges d-flex gap-2 mb-1">
+                                                    <span class="badge badge-light text-muted badge-compact"><i class="fas fa-cog"></i> Case Study +9</span>
+                                                    <span class="badge badge-light text-muted badge-compact"><i class="fas fa-globe"></i> <%= listing.mode %></span>
+                                                </div>
+                                            </div>
+                                            <div class="competition-thumb">
+                                                <img src="<%= (listing.image ? encodeURI(listing.image) : 'https://via.placeholder.com/80') %>" alt="thumb" class="rounded-thumb">
+                                            </div>
+                                        </div>
+                                        <div class="competition-body p-3">
+                                            <h5 class="mb-1 comp-title"><%= listing.title %></h5>
+                                            <p class="text-muted small mb-2 competition-subtitle"><%= listing.theme %></p>
+                                            <small class="text-muted" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= listing.location %>">
+                                                <i class="fas fa-map-marker-alt"></i> <%= listing.location.length > 50 ? listing.location.substring(0,50) + '...' : listing.location %>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+                <button class="carousel-control-prev competitions-carousel-btn" type="button" data-bs-target="#competitionsCarousel" data-bs-slide="prev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-control-next competitions-carousel-btn" type="button" data-bs-target="#competitionsCarousel" data-bs-slide="next">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <script>
+                // Initialize Bootstrap tooltips for the competitions carousel
+                (function () {
+                    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                        try { new bootstrap.Tooltip(tooltipTriggerEl); } catch (e) { /* ignore when bootstrap not loaded yet */ }
+                    });
+                })();
+            </script>
+        </div>
+
+        <% 
+            // AI-Powered Courses section (sourced from Workshop category)
+            const workshopListings = allListings.filter(l => l.category === 'Workshop');
+        %>
+        <% if (workshopListings && workshopListings.length) { %>
+        <div class="courses-section mt-5 mb-5">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="courses-accent"></div>
+                    <div>
+                        <h3 class="mb-1 courses-title">AI-Powered Courses</h3>
+                        <p class="text-muted small mb-0">Unfold your potential through AI-designed, expert-validated courses.</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="/listings/explore?category=Workshop" class="btn btn-viewall">View All <i class="fas fa-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <% workshopListings.slice(0,4).forEach(listing => { %>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <a href="/listings/<%= listing._id %>" style="text-decoration: none; color: inherit;">
+                        <div class="course-card h-100 rounded shadow-sm bg-white">
+                            <div class="course-image" style="background-image: url('<%= (listing.image ? encodeURI(listing.image) : "https://via.placeholder.com/800x400") %>');"></div>
+                            <div class="course-body p-3 d-flex flex-column">
+                                <div class="mb-2 text-muted small"><i class="fas fa-play-circle"></i> <%= listing.teamSize %> Modules</div>
+                                <h5 class="course-title mb-1"><%= listing.title %></h5>
+                                <p class="course-desc text-muted small mb-3"><%= listing.theme %></p>
+                                <div class="mt-auto d-flex justify-content-between align-items-center">
+                                    <a class="text-primary" href="/listings/<%= listing._id %>">View Course <i class="fas fa-arrow-right ms-2"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Trusted by Industry Veterans -->
+        <div class="trusted-section mt-5 mb-5">
+            <div class="trusted-inner">
+                <h4 class="trusted-heading"><span class="trusted-blue">Trusted</span> by Industry Veterans</h4>
+                <% 
+                    // Prepare logo list with sponsor images from soponser folder
+                    const logos = [
+                        {src: '/images/soponser/sopanser1.jpeg', alt: 'sponsor1'},
+                        {src: '/images/soponser/sopanser2.jpeg', alt: 'sponsor2'},
+                        {src: '/images/soponser/sopanser3.jpeg', alt: 'sponsor3'},
+                        {src: '/images/soponser/sopanser4.jpeg', alt: 'sponsor4'},
+                        {src: '/images/soponser/sopanser5.jpeg', alt: 'sponsor5'}
+                    ];
+                %>
+                <div class="trusted-viewport mt-3 mb-3">
+                    <div class="trusted-carousel-track" id="trustedTrack">
+                        <% logos.forEach(l => { %>
+                            <div class="trusted-logo-item">
+                                <img src="<%= l.src %>" alt="<%= l.alt %>" class="trusted-logo img-fluid" />
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- Controls removed: auto-scroll only -->
+
+                <script>
+                    (function(){
+                        const track = document.getElementById('trustedTrack');
+                        if(!track) return;
+                        const viewport = track.parentElement;
+                        const prevBtn = document.querySelector('.trusted-prev');
+                        const nextBtn = document.querySelector('.trusted-next');
+                        let index = 0;
+                        let intervalMs = 2200;
+                        let autoInterval;
+
+                        function getDimensions() {
+                            const items = track.querySelectorAll('.trusted-logo-item');
+                            const gap = parseFloat(getComputedStyle(track).gap) || 24;
+                            const itemWidth = items[0] ? items[0].getBoundingClientRect().width : 160;
+                            const visibleCount = Math.max(1, Math.floor(viewport.getBoundingClientRect().width / (itemWidth + gap)));
+                            return { items, itemWidth, gap, visibleCount };
+                        }
+
+                        function update() {
+                            const { items, itemWidth, gap, visibleCount } = getDimensions();
+                            const maxIndex = Math.max(0, items.length - visibleCount);
+                            if (index > maxIndex) index = 0;
+                            track.style.transition = 'transform 0.6s ease';
+                            const translate = index * (itemWidth + gap);
+                            track.style.transform = `translateX(-${translate}px)`;
+                        }
+
+                        function next() { index++; update(); }
+                        function prev() { index = Math.max(0, index - 1); update(); }
+
+                        function startAuto() {
+                            stopAuto();
+                            autoInterval = setInterval(()=>{ next(); }, intervalMs);
+                        }
+                        function stopAuto() { if (autoInterval) clearInterval(autoInterval); }
+
+                        prevBtn && prevBtn.addEventListener('click', ()=>{ prev(); startAuto(); });
+                        nextBtn && nextBtn.addEventListener('click', ()=>{ next(); startAuto(); });
+
+                        window.addEventListener('resize', ()=>{ setTimeout(update,120); });
+
+                        // initialize
+                        setTimeout(()=>{ update(); startAuto(); }, 100);
+                    })();
+                </script>
+            </div>
+        </div>
+
+        <% if(allListings.length === 0) { %>
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-5x text-muted mb-3"></i>
+            <h3>No Events Found</h3>
+            <p class="text-muted"><% if(typeof searchQuery !== 'undefined' && searchQuery && searchQuery.title) { %>No events match "<%= searchQuery.title %>". Try a different search.<% } else { %>Create your first event to get started!<% } %></p>
+            <a href="/listings/new" class="btn btn-primary">Create New Event</a>
+            <% if(typeof searchQuery !== 'undefined' && searchQuery && searchQuery.title) { %>
+                <a href="/listings" class="btn btn-secondary">Clear Search</a>
+            <% } %>
+        </div>
+        <% } %>
+    </div>
+
+
+    <script>
+        // Sync banner left text with carousel slides
+        const slideTexts = [
+            { title: "Innovating the Digital Future", subtitle: "Explore the latest advancements in technology through expert talks, live demonstrations, and interactive sessions designed to inspire innovation and digital growth." },
+            { title: "Play with Passion", subtitle: "A dynamic sports segment promoting fitness, teamwork, and competitive spirit through exciting games, training sessions, and challenges." },
+            { title: "Celebrating Culture & Creativity", subtitle: "An engaging cultural experience showcasing talent, traditions, music, dance, and art, bringing creativity and diversity together on one platform." },
+            { title: "Learn, Build, Grow", subtitle: "Hands-on workshops focused on skill development, practical learning, and creative problem-solving, guided by experienced professionals." }
+        ];
+
+        const bannerTitle = document.getElementById('bannerTitle');
+        const bannerSubtitle = document.getElementById('bannerSubtitle');
+        const bannerCarousel = document.getElementById('bannerCarousel');
+
+        if (bannerCarousel) {
+            bannerCarousel.addEventListener('slid.bs.carousel', function(event) {
+                const index = event.to;
+                if (slideTexts[index]) {
+                    bannerTitle.style.opacity = '0';
+                    bannerSubtitle.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        bannerTitle.textContent = slideTexts[index].title;
+                        bannerSubtitle.textContent = slideTexts[index].subtitle;
+                        bannerTitle.style.opacity = '1';
+                        bannerSubtitle.style.opacity = '1';
+                    }, 200);
+                }
+            });
+        }
+
+        // Featured carousel heart favorite toggle
+        document.querySelectorAll('.featured-heart').forEach(heart => {
+            heart.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                heart.querySelector('i').classList.toggle('far');
+                heart.querySelector('i').classList.toggle('fas');
+            });
+        });
+    </script>
+</body>

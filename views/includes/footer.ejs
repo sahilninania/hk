@@ -1,0 +1,52 @@
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-col footer-left">
+      <div class="footer-logo">Eventrix</div>
+      <p class="footer-desc">Empowering organizers and participants with events, workshops, and competitions that connect communities and drive learning.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="facebook" class="social"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" aria-label="linkedin" class="social"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#" aria-label="instagram" class="social"><i class="fa-brands fa-instagram"></i></a>
+      </div>
+      <button id="backToTop" class="btn btn-outline-light btn-back-to-top">Back to Top</button>
+    </div>
+
+    <div class="footer-col footer-links">
+      <h5>Site Map</h5>
+      <ul>
+        <li><a href="/">Homepage</a></li>
+        <li><a href="/listings">Technology</a></li>
+        <li><a href="/">Resources &amp; news</a></li>
+        <li><a href="/careers">Careers</a></li>
+        <li><a href="/contact">Contact Us</a></li>
+        <li><a href="/portal">Portal</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col footer-legal">
+      <h5>Legal</h5>
+      <ul>
+        <li><a href="/privacy">Privacy Policy</a></li>
+        <li><a href="/terms">Terms of Service</a></li>
+        <li><a href="/lawyers">Lawyer's Corners</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-bar-inner">
+      <div class="copyright">&copy; <%= new Date().getFullYear() %> Eventrix. All Rights Reserved.</div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('backToTop');
+      if(btn){
+        btn.addEventListener('click', function(){
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    })();
+  </script>
+</footer>
