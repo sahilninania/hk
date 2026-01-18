@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+mongoose.set("bufferCommands", false);
 const path = require('path');
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
@@ -63,13 +64,26 @@ app.use((req, res, next) => {
     next();
 });
 
-main()
-  .then(() => console.log("connected to db"))
-  .catch(err => console.log(err));
+let isConnected = false;
 
-async function main() {
-  await mongoose.connect(process.env.MONGO_URI);
+async function connectDB() {
+  if (isConnected) return;
+
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    isConnected = true;
+    console.log("MongoDB connected");
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+    throw err;
+  }
 }
+
+connectDB();
+
 
 // Use routes
 app.use("/listings", listingRoutes);

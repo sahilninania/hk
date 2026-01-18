@@ -7,6 +7,21 @@ const multer = require('multer');
 const { storage } = require("../cloudConfig.js");
 const upload = multer({ storage });
 
+router.get("/", async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ error: "DB not connected" });
+    }
+
+    const listings = await Listing.find({});
+    res.json(listings);
+  } catch (err) {
+    console.error("LISTINGS ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 router.route("/")                 // router.route("/") → /listings
     .get(wrapAsync(listingController.index))     // INDEX ROUTE    
     .post(isLoggedIn, upload.single("listing[image][url]"), validateListing, wrapAsync(listingController.createListing));           // CREATE ROUTE
